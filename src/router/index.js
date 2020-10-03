@@ -8,8 +8,8 @@ import memberRouter from './modules/member'
 import manageRouter from './modules/manage'
 import settingRouter from './modules/setting'
 import statsRouter from './modules/stats'
-import meritsRouter from './modules/merits'
 import taskRouter from './modules/task'
+
 export const constantRoutes = [
   {
     path: '/redirect',
@@ -22,6 +22,7 @@ export const constantRoutes = [
       }
     ]
   },
+
   {
     path: '/login',
     component: () => import('@/views/login/index'),
@@ -36,6 +37,7 @@ export const constantRoutes = [
     path: '/ticket',
     component: () => import('@/views/ticket/index')
   },
+
   {
     path: '/404',
     component: () => import('@/views/error-page/404'),
@@ -63,10 +65,9 @@ export const constantRoutes = [
 
 export const asyncRoutes = [
   manageRouter,
-  statsRouter,
-  meritsRouter,
-  settingRouter,
   taskRouter,
+  statsRouter,
+  settingRouter,
   memberRouter,
   { path: '*', redirect: '/401', hidden: true }
 

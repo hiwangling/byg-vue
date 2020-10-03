@@ -1,5 +1,5 @@
 module.exports = {
-  title: '嘉鱼殡仪馆管理系统',
+  title: '殡仪馆管理系统',
 
   /**
    * @type {boolean} true | false

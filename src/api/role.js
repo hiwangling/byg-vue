@@ -39,7 +39,13 @@ export function getPermission(query) {
     params: query
   })
 }
-
+export function getPermissions(query) {
+  return request({
+    url: '/auth_rule/alls',
+    method: 'get',
+    params: query
+  })
+}
 export function updatePermission(data) {
   return request({
     url: '/branch/auth',
@@ -53,5 +59,61 @@ export function roleOptions(query) {
     url: '/branch/all_name',
     method: 'post',
     params: query
+  })
+}
+export function auth_rulelist(data) {
+  return request({
+    url: '/auth_rule/list',
+    method: 'post',
+    data
+  })
+}
+export function auth_ruleadd(data) {
+  return request({
+    url: '/auth_rule/add',
+    method: 'post',
+    data
+  })
+}
+export function auth_ruleedit(data) {
+  return request({
+    url: '/auth_rule/edit',
+    method: 'post',
+    data
+  })
+}
+export function auth_ruledel(query) {
+  return request({
+    url: '/auth_rule/del',
+    method: 'get',
+    params: query
+  })
+}
+export function deptdel(query) {
+  return request({
+    url: '/dept/del',
+    method: 'get',
+    params: query
+  })
+}
+export function deptlist(data) {
+  return request({
+    url: '/dept/list',
+    method: 'post',
+    data
+  })
+}
+export function deptadd(data) {
+  return request({
+    url: '/dept/add',
+    method: 'post',
+    data
+  })
+}
+export function deptedit(data) {
+  return request({
+    url: '/dept/edit',
+    method: 'post',
+    data
   })
 }

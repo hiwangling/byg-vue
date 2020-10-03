@@ -30,26 +30,6 @@ const manageRouter = {
       }
     },
     {
-      path: '/save',
-      name: 'Vuesave',
-      component: () => import('@/views/manage/save'),
-      meta: {
-        title: '寄存管理',
-        noCache: true,
-        perms: ['post /api/v1/check/list']
-      }
-    },
-    {
-      path: '/basic',
-      name: 'Vuebasic',
-      component: () => import('@/views/manage/basic'),
-      meta: {
-        title: '低保管理',
-        noCache: true,
-        perms: ['post /api/v1/financeDerate/list']
-      }
-    },
-    {
       path: '/finance',
       name: 'Vuefinance',
       component: () => import('@/views/manage/finance'),
@@ -59,7 +39,6 @@ const manageRouter = {
         perms: ['post /api/v1/finance/list']
       }
     }
-
   ]
 }
 export default manageRouter

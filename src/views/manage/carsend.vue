@@ -34,6 +34,11 @@
       <el-table-column align="center" label="逝者姓名" prop="name" width="120" />
       <el-table-column align="center" label="联系人" prop="linkman" width="120" />
       <el-table-column align="center" label="联系电话" prop="linkphone" width="120" />
+      <el-table-column align="center" label="司机" prop="driver" width="70">
+        <template slot-scope="scope">
+          <span> {{ scope.row.driver | driver_name }}</span>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="出车时间" prop="outtime" width="160" />
       <el-table-column align="center" label="预约地址" prop="address" />
       <el-table-column align="center" label="状态" prop="state" width="100">
@@ -49,11 +54,11 @@
             size="mini"
             @click="handleUpdate(scope.row)"
           >编辑</el-button>
-          <el-button
+          <!-- <el-button
             type="primary"
             size="mini"
             @click="handlePrint(scope.row)"
-          >打印</el-button>
+          >打印</el-button> -->
           <el-button
             type="danger"
             size="mini"
@@ -126,16 +131,21 @@
               </el-select>
             </el-form-item>
             <el-form-item label="选择司机" prop="driver">
+              <el-select v-model="dataForm.driver" placeholder="请选择" clearable class="filter-item" style="width:185px">
+                <el-option v-for="(item,value,index) in drivername" :key="index" :label="item" :value="value + 1" />
+              </el-select>
+            </el-form-item>
+            <!-- <el-form-item label="选择司机" prop="driver">
               <el-select v-model="dataForm.driver" placeholder="" clearable class="filter-item" style="width:185px" @change="CarBind">
                 <el-option v-for="(item,value,index) in getservice" :key="index" :label="item.realname" :value="item.id" />
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <!-- <el-form-item label="司机" prop="driver">
               <el-input v-model="dataForm.driver" />
             </el-form-item> -->
-            <el-form-item label="接运价格" prop="totalprice">
+            <!-- <el-form-item label="接运价格" prop="totalprice">
               <el-input v-model="dataForm.totalprice" />
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="备注" prop="remark">
               <el-input v-model="dataForm.remark" type="textarea" :rows="2" />
             </el-form-item>
@@ -296,8 +306,8 @@ export default {
         linkman: '',
         cid: '',
         oid: null,
-        recetype: '',
-        totalprice: '',
+        recetype: 1,
+        totalprice: 0,
         linkphone: '',
         driver: '',
         operator: '',

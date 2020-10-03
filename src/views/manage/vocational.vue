@@ -35,27 +35,29 @@
       <el-table-column align="center" label="逝者姓名" prop="name" />
       <el-table-column align="center" label="联系人" prop="linkman" />
       <el-table-column align="center" label="联系电话" prop="linkphone" />
-      <el-table-column align="center" label="火化时间" prop="farewelltime" />
+      <el-table-column align="center" label="火化时间" prop="farewelltime" width="100" />
+      <el-table-column align="center" label="悼念厅" prop="mourn_title" />
       <el-table-column align="center" label="操作人" prop="operator" />
+      <el-table-column align="center" label="办理时间" prop="create_time" width="100" />
       <el-table-column align="center" label="状态" prop="state" width="100">
         <template slot-scope="scope">
           <el-tag :type="scope.row.state | carFilter"> {{ scope.row.state | obituary_list }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" class-name="small-padding" width="360">
+      <el-table-column align="center" label="操作" class-name="small-padding" width="220">
         <template slot-scope="scope">
           <el-button
             type="primary"
             size="mini"
             @click="handleUpdate(scope.row)"
           >编辑</el-button>
-          <el-button
+          <!-- <el-button
             type="primary"
             size="mini"
             @click="handleUpdates(scope.row)"
-          >出车</el-button>
+          >出车</el-button> -->
           <el-button type="primary" size="mini" @click="handleInfo(scope.row)">详情</el-button>
-          <el-button type="primary" size="mini" @click="handleEnd(scope.row)">完结</el-button>
+
           <el-button
             type="danger"
             size="mini"
@@ -82,7 +84,7 @@
         :model="dataForm"
         status-icon
         label-position="left"
-        label-width="100px"
+        label-width="90px"
       >
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane label="基本信息" name="info">
@@ -126,17 +128,7 @@
             <el-form-item label="民族" prop="nation">
               <el-input v-model="dataForm.nation" />
             </el-form-item>
-            <el-form-item label="是否低保户" prop="basic">
-              <el-select
-                v-model="dataForm.basic"
-                placeholder="请选择"
-                clearable
-                class="filter-item"
-                style="width:185px"
-              >
-                <el-option v-for="(item,value,index) in basic" :key="index" :label="item" :value="value + 1" />
-              </el-select>
-            </el-form-item>
+
             <el-form-item label="是否寄存" prop="ifcheck">
               <el-select
                 v-model="dataForm.ifcheck"
@@ -189,6 +181,12 @@
             <el-form-item label="联系人电话" prop="linkphone">
               <el-input v-model="dataForm.linkphone" />
             </el-form-item>
+            <el-form-item label="联系身份证" prop="linkcard">
+              <el-input v-model="dataForm.linkcard" />
+            </el-form-item>
+            <el-form-item label="联系人地址" prop="linkaddress">
+              <el-input v-model="dataForm.linkaddress" />
+            </el-form-item>
             <el-form-item label="逝者关系" prop="relation">
               <el-input v-model="dataForm.relation" />
             </el-form-item>
@@ -211,7 +209,7 @@
                 v-model="mourn_data.startime"
                 type="datetime"
                 style="width:200px"
-                value-format="yyyy-MM-dd HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm"
                 placeholder="选择日期时间"
               />
             </el-form-item>
@@ -220,15 +218,20 @@
                 v-model="mourn_data.endtime"
                 type="datetime"
                 style="width:200px"
-                value-format="yyyy-MM-dd HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm"
                 placeholder="选择日期时间"
               />
+              <span style="color:red;margin-left:5px">{{ day }}</span>
+            </el-form-item>
+            <el-form-item label="小时">
+              <el-input v-model="mourn_data.hours" clearable placeholder="小时" style="width:200px" @focus="countimer(mourn_data,1)" />
             </el-form-item>
             <el-form-item label="选择灵堂" prop="mourn_data_title">
-              <el-input v-model="mourn_data.list.title" placeholder="请选择灵堂" clearable style="width:200px" @focus="Show(1)" />
+              <el-input v-model="mourn_data.list.title" placeholder="请选择灵堂" clearable style="width:200px" @focus="Show(1)" /><span v-if="mourn_data.list.price > 0" style="color:red;margin-left:5px">{{ mourn_data.list.price }}元</span>
             </el-form-item>
+
             <el-form-item label="合计">
-              <el-input v-model="mourn_data.totalprice" placeholder="合计" style="width:200px" />
+              <el-input v-model="mourn_data.totalprice" clearable placeholder="合计" style="width:200px" @focus="total_count" />
             </el-form-item>
             <el-form-item label="备注" prop="remark">
               <el-input v-model="mourn_data.remark" style="width:200px" />
@@ -240,7 +243,7 @@
                 v-model="cold_data.startime"
                 type="datetime"
                 style="width:200px"
-                value-format="yyyy-MM-dd HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm"
                 placeholder="选择日期时间"
               />
             </el-form-item>
@@ -249,15 +252,19 @@
                 v-model="cold_data.endtime"
                 type="datetime"
                 style="width:200px"
-                value-format="yyyy-MM-dd HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm"
                 placeholder="选择日期时间"
               />
+              <span style="color:red">{{ days }}</span>
+            </el-form-item>
+            <el-form-item label="小时">
+              <el-input v-model="cold_data.hours" clearable placeholder="小时" style="width:200px" @focus="countimer(cold_data,2)" />
             </el-form-item>
             <el-form-item label="选择冷柜" prop="cold_data_title">
-              <el-input v-model="cold_data.list.title" clearable placeholder="请选择冷柜" style="width:200px" @focus="Show(2)" />
+              <el-input v-model="cold_data.list.title" clearable placeholder="请选择冷柜" style="width:200px" @focus="Show(2)" /><span v-if="cold_data.list.price > 0" style="color:red;margin-left:5px">{{ cold_data.list.price }}元</span>
             </el-form-item>
             <el-form-item label="合计">
-              <el-input v-model="cold_data.totalprice" placeholder="合计" style="width:200px" />
+              <el-input v-model="cold_data.totalprice" clearable placeholder="合计" style="width:200px" @focus="total_counts" />
             </el-form-item>
             <el-form-item label="备注" prop="remark">
               <el-input v-model="cold_data.remark" style="width:200px" />
@@ -319,9 +326,9 @@
                 <el-option v-for="(item,value,index) in getservice" :key="index" :label="item.realname" :value="item.id" />
               </el-select>
             </el-form-item>
-            <el-form-item label="接运价格" prop="totalprice">
+            <!-- <el-form-item label="接运价格" prop="totalprice">
               <el-input v-model="recar.totalprice" />
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="备注" prop="remark">
               <el-input v-model="recar.remark" type="textarea" :rows="2" />
             </el-form-item>
@@ -337,8 +344,8 @@
       </div>
     </el-dialog>
     <el-dialog :close-on-click-modal="false" title="查看" :visible.sync="dialogFormVisibleInfo">
-      <div class="bury_car">
-        <h1 class="bury_car_h1">逝者信息</h1>
+      <div class="temp-content">
+        <h1>逝者信息</h1>
         <el-row :gutter="20">
           <el-col :span="8">
             <div class="grid-content">
@@ -368,96 +375,91 @@
           </el-col>
         </el-row>
       </div>
-      <div v-if="InfoServer ? InfoServer.length > 0 : false" class="bury_car" style="border:1px solid #23C6C8;margin-top:10px;">
-        <h1 class="bury_car_h1" style="background:#23C6C8;color:#fff">所选服务</h1>
-        <el-row :gutter="20">
-          <div v-for="(item,index) in InfoServer" :key="index">
-            <el-col :span="12">
+      <div v-if="mourn" class="temp-content temp-content-cold">
+        <h1>灵堂服务</h1>
+        <template>
+          <el-row :gutter="20">
+            <el-col :span="8">
               <div class="grid-content">
-                <p><span> 服务名称 : </span>{{ item.title }}<span v-show="item.state > 1">(已签收)</span></p>
-              </div>
-            </el-col>
-            <el-col :span="4">
-              <div class="grid-content">
-                <p><span> 数量 : </span>{{ item.number }}</p>
+                <p><span> 灵堂名称 : </span>{{ mourn.title }}</p>
+                <p><span> 小时 : </span>{{ mourn.hours }} 小时</p>
+                <p><span> 备注 : </span>{{ mourn.remark }}</p>
               </div>
             </el-col>
             <el-col :span="8">
               <div class="grid-content">
-                <p><span> 合计 : </span>{{ item.totalprice }}</p>
+                <p><span> 开始时间 : </span>{{ mourn.startime }}</p>
+                <p><span> 总价 : </span>{{ mourn.totalprice }}</p>
+
               </div>
             </el-col>
+            <el-col :span="8">
+              <div class="grid-content">
+                <p><span> 结束时间 : </span>{{ mourn.endtime }}</p>
+                <p><span> 操作人 : </span>{{ mourn.operator }}</p>
+              </div>
+            </el-col>
+          </el-row>
+        </template>
+      </div>
+      <div v-if="cold" class="temp-content temp-content-cold">
+        <h1>冷藏柜</h1>
+        <template>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <div class="grid-content">
+                <p><span> 冷藏柜名称 : </span>{{ cold.title }}</p>
+                <p><span> 价格 : </span>{{ cold.totalprice }}</p>
+              </div>
+            </el-col>
+            <el-col :span="8">
+              <div class="grid-content">
+                <p><span> 开始时间 : </span>{{ cold.startime }}</p>
+                <p><span> 备注 : </span>{{ cold.remark }}</p>
+              </div>
+            </el-col>
+            <el-col :span="8">
+              <div class="grid-content">
+                <p><span> 结束时间 : </span>{{ cold.endtime }}</p>
+                <p><span> 操作人 : </span>{{ cold.operator }}</p>
+              </div>
+            </el-col>
+          </el-row>
+        </template>
+      </div>
+      <div v-if="ServerList ? ServerList.length>0 : false" class="temp-content temp-content-server">
+        <h1>所选服务</h1>
+        <template>
+          <div v-for="(v,w) in ServerList" :key="w">
+            <el-divider content-position="left">{{ v.title }}</el-divider>
+            <el-row :gutter="20">
+              <div v-for="(item,index) in v.services" :key="index">
+                <el-col :span="12">
+                  <div class="grid-content">
+                    <p><span> 服务名称 : </span>{{ item.title }}</p>
+                  </div>
+                </el-col>
+                <el-col :span="4">
+                  <div class="grid-content">
+                    <p><span> 数量 : </span>{{ item.number }} </p>
+                  </div>
+                </el-col>
+                <el-col :span="8">
+                  <div class="grid-content">
+                    <p><span> 合计 : </span>{{ item.totalprice }}</p>
+                  </div>
+                </el-col>
+              </div>
+            </el-row>
           </div>
-        </el-row>
-      </div>
-      <div v-if="infodataForm.cold" class="bury_car" style="border:1px solid #63afde;margin-top:10px;">
-        <h1 class="bury_car_h1" style="background:#63afde;color:#fff">冷藏柜</h1>
-        <el-row :gutter="20">
-          <el-col :span="5">
-            <div class="grid-content">
-              <p><span>冷藏柜名称 : </span>{{ infodataForm.cold.title }}</p>
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <div class="grid-content">
-              <p><span>开始时间 : </span>{{ infodataForm.cold.startime }}</p>
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <div class="grid-content">
-              <p><span>结束时间 : </span>{{ infodataForm.cold.endtime }}</p>
-            </div>
-          </el-col>
-          <el-col :span="5">
-            <div class="grid-content">
-              <p><span>价格合计 : </span>{{ infodataForm.cold.totalprice }}</p>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-      <div v-if="infodataForm.mourn" class="bury_car" style="border:1px solid #74bcffba;margin-top:10px;">
-        <h1 class="bury_car_h1" style="background:#74bcffba;color:#fff">悼念厅</h1>
-        <el-row :gutter="20">
-          <el-col :span="5">
-            <div class="grid-content">
-              <p><span>悼念厅名称 : </span>{{ infodataForm.mourn.title }}</p>
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <div class="grid-content">
-              <p><span>开始时间 : </span>{{ infodataForm.mourn.startime }}</p>
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <div class="grid-content">
-              <p><span>结束时间 : </span>{{ infodataForm.mourn.endtime }}</p>
-            </div>
-          </el-col>
-          <el-col :span="5">
-            <div class="grid-content">
-              <p><span>价格合计 : </span>{{ infodataForm.mourn.totalprice }}</p>
-            </div>
-          </el-col>
-        </el-row>
+        </template>
       </div>
       <div slot="footer" class="dialog-footer">
-        <!-- <span v-if="record_sign" class="sign_">家属签字：<img :src="record_sign" alt="" @click="dialogFormSign = true"> </span>
-        <el-button v-if="record_ifsign == 0" type="primary" @click="sign_open">签字</el-button>
-        <el-button v-if="record_ifsign == 0" type="primary" @click="SignSend">确定</el-button> -->
-        <!-- <el-button type="primary" @click="SignSend">打印</el-button>  -->
+        <span style="color:red;font-size:14px;margin-right:10px;font-weight: 800;">总价：<b>{{ totalprice == null ? 0 : totalprice }}</b> 元</span>
         <el-button @click="dialogFormVisibleInfo = false">取消</el-button>
       </div>
     </el-dialog>
     <box ref="box" @box_data="box_data" />
-    <!-- <el-dialog :close-on-click-modal="false" title="签名" :visible.sync="dialogFormVisibleSign" @close="sign_close">
-      <e560 ref="child" @cancel="cancel" @imgData="imgData" />
-    </el-dialog>
-    <el-dialog :close-on-click-modal="false" title="查看签名" :visible.sync="dialogFormSign">
-      <img :src="record_sign" alt="">
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormSign = false">取消</el-button>
-      </div>
-    </el-dialog> -->
   </div>
 </template>
 <script>
@@ -468,8 +470,6 @@ import {
   infoobituary,
   editobituary,
   delobituary,
-  signobituary,
-  obituaryend,
   carsendagain
 } from '@/api/manage'
 import axios from 'axios'
@@ -477,12 +477,11 @@ import { managerlist } from '@/api/vocational'
 import Pagination from '@/components/Pagination'
 import box from '@/components/Box'
 import service from '@/components/Service'
-import sign from '@/components/Sign'
-import e560 from '@/components/E560'
+
 import { vuexData } from '@/utils/mixin'
 export default {
   name: 'VueGarden',
-  components: { Pagination, box, service, sign, e560 },
+  components: { Pagination, box, service },
   mixins: [vuexData],
   data() {
     var validateDate = (rule, value, callback) => {
@@ -510,15 +509,14 @@ export default {
     return {
       list: null,
       flag: true,
+      day: '',
+      days: '',
+      totalprice: '',
       EditServer: null,
-      InfoServer: null,
+      ServerList: null,
       recetype: null,
-      signatureid: '',
-      record_sign: '',
       getservice: null,
-      record_ifsign: '',
-      // birthday: '',
-      mourn: null,
+      mourn: null || 0,
       cold: null,
       server: null,
       infodataForm: {
@@ -540,6 +538,7 @@ export default {
         startime: null,
         endtime: null,
         remark: '',
+        hours: null,
         totalprice: '',
         list: {
           title: ''
@@ -549,6 +548,7 @@ export default {
         startime: null,
         endtime: null,
         totalprice: '',
+        hours: null,
         remark: '',
         list: {
           title: ''
@@ -572,7 +572,7 @@ export default {
         age: '',
         card: '',
         unknown: '',
-        basic: '',
+        linkaddress: '',
         dietime: null,
         farewelltime: null,
         registered: '',
@@ -582,6 +582,7 @@ export default {
         linkman: '',
         relation: '',
         linksex: '',
+        linkcard: '',
         ifcheck: 2,
         nation: '汉',
         linkphone: '',
@@ -599,10 +600,10 @@ export default {
         sex: '',
         age: '',
         address: '',
-        recetype: '',
+        recetype: 1,
         outtime: null,
         linkman: '',
-        totalprice: '',
+        totalprice: 0,
         linkphone: '',
         driver: '',
         cid: '',
@@ -611,17 +612,17 @@ export default {
         remark: '',
         server: null
       },
+
       dialogFormVisible: false,
       dialogFormVisibleInfo: false,
       dialogFormVisiblecar: false,
-      dialogFormVisibleSign: false,
-      dialogFormSign: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '创建',
         updates: '再次出车'
       },
+      options: [],
       rules: {
         mourn_data_startime: [
           { type: 'date', validator: validateDate, trigger: 'change' }
@@ -655,15 +656,7 @@ export default {
   },
   created() {
     this.getList()
-    const data = {
-      branch: 2
-    }
-    managerlist(data).then(res => {
-      this.getservice = res.data
-      this.$forceUpdate()
-    })
   },
-
   methods: {
     getList() {
       this.listLoading = true
@@ -678,7 +671,12 @@ export default {
           this.total = 0
           this.listLoading = false
         })
+      managerlist({ branch: 2 }).then(res => {
+        this.getservice = res.data
+        this.$forceUpdate()
+      })
     },
+
     getCard(val) {
       var url = 'http://127.0.0.1:38088/card=idcard'
       var params = ''
@@ -692,17 +690,23 @@ export default {
               message: '身份信息获取成功'
             })
             if (val == 0) {
-              var myDate = new Date()
-              var tYear = myDate.getFullYear()
               this.dataForm.name = info.name
               this.dataForm.sex = info.sex
               this.dataForm.card = info.cardID
-              this.dataForm.birthday = info.birthday
               this.dataForm.registered = info.address
+              var birthday = []
+              birthday[0] = info.birthday.substring(0, 4)
+              birthday[1] = info.birthday.substring(4, 6)
+              birthday[2] = info.birthday.substring(6, 8)
+              this.dataForm.birthday = birthday.join('-')
+              var myDate = new Date()
+              var tYear = myDate.getFullYear()
               this.dataForm.age = parseInt(tYear) - (info.birthday.substr(0, 4))
             } else {
               this.dataForm.linkman = info.name
               this.dataForm.linksex = info.sex
+              this.dataForm.linkcard = info.cardID
+              this.dataForm.linkaddress = info.address
             }
           } else {
             this.$notify.error({
@@ -718,27 +722,33 @@ export default {
           })
         })
     },
-    sign_open() {
-      this.record_sign = ''
-      this.dialogFormVisibleSign = true
-      this.$nextTick(() => {
-        this.$refs.child.initDevice()
-      })
-    },
-    sign_close() {
-      this.$refs.child.uninitDevice()
-    },
-    cancel() {
-      this.dialogFormVisibleSign = false
-    },
-    imgData(v) {
-      this.record_sign = v
+
+    countimer(v, x) {
+      var date1 = v.startime
+      var date2 = new Date(v.endtime)
+      var date3 = date2.getTime() - new Date(date1).getTime()
+      var days = Math.floor(date3 / (24 * 3600 * 1000))
+      var leave1 = date3 % (24 * 3600 * 1000)
+      var hours = Math.floor(leave1 / (3600 * 1000))
+
+      var timer = days * 24 + hours
+      if (timer < 0) {
+        this.$message.error('输入时间有误,请重新输入')
+        v.hours = null
+      } else {
+        v.hours = timer
+        if (x == 1) {
+          this.day = +days + '天 ' + hours + '小时'
+        } else {
+          this.days = +days + '天 ' + hours + '小时'
+        }
+      }
     },
     getCommon(v) {
       getobituary().then(res => {
         this.mourn = res.data.mourn
         this.cold = res.data.cold
-        this.recetype = res.data.recetype
+        this.recetype = res.data.recetype || 1
         this.server = res.data.services
         const data = {
           type: v,
@@ -751,30 +761,17 @@ export default {
       this.dataForm.type = val.type
       if (val.type == 1) {
         this.mourn_data.list = Object.assign({}, val.data)
-        this.mourn_data.totalprice = val.data.price
       } else {
         this.cold_data.list = Object.assign({}, val.data)
-        this.cold_data.totalprice = val.data.price
       }
     },
-    SignSend() {
-      const data = { signature: this.record_sign, id: this.signatureid }
-      signobituary(data).then(res => {
-        if (res.code == 0) {
-          this.$notify.success({
-            title: '成功',
-            message: '操作成功'
-          })
-          this.getList()
-          this.dialogFormVisibleInfo = false
-        } else {
-          this.$notify.error({
-            title: '失败',
-            message: res.msg
-          })
-        }
-      })
+    total_count() {
+      this.mourn_data.totalprice = (this.mourn_data.list.price || 0) * this.mourn_data.hours
     },
+    total_counts() {
+      this.cold_data.totalprice = (this.cold_data.list.price || 0) * this.cold_data.hours
+    },
+
     Show(val) {
       const data = {
         list: val == 1 ? this.mourn : this.cold,
@@ -796,28 +793,34 @@ export default {
         sex: '',
         age: '',
         card: '',
-        basic: '',
+        // basic: '',
         ifcheck: 2,
         remark: '',
+        // nature: 1,
         registered: '',
         dietime: null,
+
         unknown: 0,
         reason: '',
         linkman: '',
         relation: '',
+        linkcard: '',
         linkphone: '',
         birthday: null,
+        linkaddress: '',
         nation: '汉',
         linksex: '',
         operator: '',
         farewelltime: null
       }
     },
+
     reset() {
       this.mourn_data = {
         startime: null,
         endtime: null,
         remark: '',
+        hours: null,
         totalprice: '',
         list: {
           title: ''
@@ -827,12 +830,14 @@ export default {
         startime: null,
         endtime: null,
         totalprice: '',
+        hours: null,
         remark: '',
         list: {
           title: ''
         }
       }
     },
+
     handleCreate() {
       this.resetForm()
       this.reset()
@@ -851,15 +856,12 @@ export default {
     handleInfo(row) {
       const data = { id: row.id, type: 2 }
       infoobituary(data).then(res => {
-        var editRow = []
-        res.data.services.forEach((v, k) => {
-          editRow.push(v.services)
-        })
-        this.InfoServer = [].concat.apply([], editRow)
+        var server = res.data.services.filter(v => v.totalprice > 0)
+        this.ServerList = server
+        this.totalprice = res.data.services_totalprice
+        this.mourn = res.data.mourn
+        this.cold = res.data.cold
         this.infodataForm = res.data
-        this.signatureid = row.id
-        this.record_sign = row.signature
-        this.record_ifsign = row.ifsignature
         this.dialogFormVisibleInfo = true
       })
     },
@@ -914,6 +916,7 @@ export default {
       this.recar.name = row.name
       this.recar.linkman = row.linkman
       this.recar.linkphone = row.linkphone
+
       this.getCommon(1)
       this.dialogStatus = 'updates'
       this.dialogFormVisiblecar = true
@@ -935,16 +938,6 @@ export default {
           this.cold_data = res.data.cold
         }
         this.$refs.server.editService(res.data.services)
-        // const server = {
-        //   service: res.data.services,
-        //   services_totalprice: res.data.services_totalprice
-        // }
-        // var editRow = []
-        // server.service.forEach((v, k) => {
-        //   editRow.push(v.services)
-        // })
-        // server.service = [].concat.apply([], editRow)
-        // this.dataForm.server = server
       })
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -976,38 +969,14 @@ export default {
         }
       })
     },
-    handleEnd(row) {
-      this.$confirm('您确认此操作吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        const data = {
-          id: row.id,
-          state: 15
-        }
-        obituaryend(data)
-          .then(res => {
-            this.getList()
-            this.$message({
-              type: 'success',
-              message: '操作成功!'
-            })
-          })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消操作'
-        })
-      })
-    },
+
     handleDelete(row) {
       this.$confirm('您确认删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delobituary(row)
+        delobituary({ id: row.id })
           .then(res => {
             const index = this.list.indexOf(row)
             this.list.splice(index, 1)
@@ -1027,11 +996,6 @@ export default {
 }
 </script>
 <style>
-.sign{
-  font-size: 16px;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-}
+
 </style>
 

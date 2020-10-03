@@ -55,16 +55,17 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="服务价格" prop="price" />
-      <el-table-column align="center" label="负责部门" prop="branch">
+      <el-table-column align="center" label="负责部门" prop="deptid">
         <template slot-scope="scope">
-          {{ scope.row.branch | branch }}
+          {{ scope.row.deptid | branchs }}
+
         </template>
       </el-table-column>
       <el-table-column align="center" label="单位" prop="unit" />
 
       <el-table-column align="center" label="状态" prop="status" width="100">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | or_status">{{ scope.row.status == 0 ? '禁用' : '可用' }}</el-tag>
+          <el-tag>{{ scope.row.status == 0 ? '禁用' : '可用' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" class-name="small-padding" width="150">
@@ -119,9 +120,9 @@
         <el-form-item label="服务价格" prop="price">
           <el-input v-model="dataForm.price" />
         </el-form-item>
-        <el-form-item label="关联部门" prop="branch">
+        <el-form-item label="关联部门" prop="deptid">
           <el-select
-            v-model="dataForm.branch"
+            v-model="dataForm.deptid"
             placeholder="选择部门"
             clearable
             class="filter-item"
@@ -130,7 +131,7 @@
             <el-option
               v-for="(item,index) in branch"
               :key="index"
-              :label="item.branch_name"
+              :label="item.vcname"
               :value="item.id"
             />
           </el-select>
@@ -141,7 +142,7 @@
             placeholder="选择类型"
             clearable
             class="filter-item"
-            style="width:185px"
+            style="width:180px"
           >
             <el-option
               v-for="(item,value,index) in servicestype"
@@ -163,21 +164,7 @@
             <el-option v-for="item in v" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="绩效" prop="performance">
-          <el-select
-            v-model="dataForm.performance"
-            placeholder="请选择"
-            clearable
-            class="filter-item"
-            style="width:185px"
-          >
-            <el-option label="否" :value="0" />
-            <el-option label="是" :value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="绩效金额" prop="perforprice">
-          <el-input v-model="dataForm.perforprice" />
-        </el-form-item>
+
         <el-form-item label="排序" prop="iorder">
           <el-input v-model="dataForm.iorder" />
         </el-form-item>
@@ -202,13 +189,23 @@ import {
 } from '@/api/setting'
 import Pagination from '@/components/Pagination'
 import { vuexData } from '@/utils/mixin'
-import { listRole } from '@/api/role'
+import { deptlist } from '@/api/role'
+var that
 export default {
   name: 'VueGarden',
   components: { Pagination },
+  filters: {
+    branchs(status) {
+      var obj = {}
+      that.branch.forEach((item, index) => { obj[item.id] = item.vcname })
+      console.log(obj[status])
+      return obj[status]
+    }
+  },
   mixins: [vuexData],
   data() {
     return {
+      branch: null,
       list: null,
       total: 0,
       listLoading: true,
@@ -222,7 +219,7 @@ export default {
       },
       v: [{ id: 0, name: '禁用' }, { id: 1, name: '可用' }],
       t: [
-        { id: 0, name: '元/小时' },
+        { id: 0, name: '/小时' },
         { id: 1, name: '元/天' },
         { id: 2, name: '元/次' },
         { id: 3, name: '元/具' },
@@ -248,11 +245,11 @@ export default {
         price: '',
         unit: '',
         remark: '',
+
         status: '',
-        branch: '',
+        deptid: '',
         type: '',
-        perforprice: '',
-        performance: '',
+
         iorder: ''
       },
       dialogFormVisible: false,
@@ -270,17 +267,17 @@ export default {
   },
   computed: {
   },
+  beforeCreate: function() {
+    that = this
+  },
   created() {
     this.getList()
-    this.servicestype = this.servicestype.filter((v, k) => {
-      return k != 5
-    })
-    listRole()
+    // this.servicestype = this.servicestype.filter((v, k) => {
+    //   return k != 5
+    // })
+    deptlist()
       .then(res => {
-        this.branch = res.data
-        this.branch = this.branch.filter((v, k) => {
-          return v.id != 1
-        })
+        this.branch = res.data.data
       })
   },
   methods: {
@@ -308,10 +305,8 @@ export default {
         price: 0.0,
         unit: '',
         remark: '',
-        perforprice: '',
         status: 1,
-        performance: '',
-        branch: '',
+        deptid: '',
         type: '',
         iorder: 0
       }
@@ -325,7 +320,7 @@ export default {
       })
     },
     createData() {
-      delete this.dataForm.branch_name
+      // delete this.dataForm.branch_name
       delete this.dataForm.type_name
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
@@ -356,7 +351,7 @@ export default {
       })
     },
     updateData() {
-      delete this.dataForm.branch_name
+      // delete this.dataForm.branch_name
       delete this.dataForm.type_name
       this.$refs['dataForm'].validate(valid => {
         if (valid) {

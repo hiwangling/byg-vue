@@ -241,13 +241,13 @@ export default {
       })
     },
     handleDelete(row) {
-      deletefurnace(row)
-        .then(res => {
-          this.$confirm('您确认删除吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
+      this.$confirm('您确认删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deletefurnace(row)
+          .then(res => {
             const index = this.list.indexOf(row)
             this.list.splice(index, 1)
             this.$message({
@@ -260,7 +260,7 @@ export default {
               message: '已取消删除'
             })
           })
-        })
+      })
         .catch(res => {
           this.$notify.error({
             title: '失败',

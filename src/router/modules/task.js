@@ -28,18 +28,7 @@ const taskRouter = {
         noCache: true,
         perms: ['post /api/v1/cremation/list']
       }
-    },
-    {
-      path: '/protocol',
-      name: 'Vueprotocol',
-      component: () => import('@/views/task/protocol'),
-      meta: {
-        title: '礼宾管理',
-        noCache: true,
-        perms: ['post /api/v1/protocol/list']
-      }
     }
-
   ]
 }
 export default taskRouter

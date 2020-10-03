@@ -31,12 +31,12 @@
       fit
       highlight-current-row
     >
-      <!-- <el-table-column align="center" label="牌号" prop="number" width="50" /> -->
-      <el-table-column align="center" label="逝者姓名" prop="o_name" width="100" />
-      <el-table-column align="center" label="联系人" prop="o_linkman" width="100" />
-      <el-table-column align="center" label="联系电话" prop="o_linkphone" width="150" />
-      <el-table-column align="center" label="服务" prop="services" />
-      <el-table-column align="center" label="火化时间" prop="o_farewelltime" width="160" />
+      <el-table-column align="center" label="火化编号" prop="serial" width="120" />
+      <el-table-column align="center" label="逝者姓名" prop="o_name" width="120" />
+      <el-table-column align="center" label="联系人" prop="o_linkman" />
+      <el-table-column align="center" label="联系电话" prop="o_linkphone" />
+      <!-- <el-table-column align="center" label="服务" prop="services" /> -->
+      <el-table-column align="center" label="火化时间" prop="o_farewelltime" />
       <!-- <el-table-column align="center" label="状态" prop="state">
         <template slot-scope="scope">
           <el-tag :type="scope.row.state | carFilter"> {{ scope.row.state = scope.row.state==null ? 1 : scope.row.state | cremationstate_stype }}</el-tag>
@@ -72,59 +72,6 @@
             size="mini"
             @click="handleSign(scope.row)"
           >详情</el-button>
-          <!-- <template v-if="scope.row.c_ifsignature == 0 || scope.row.c_ifsignature ==null">
-            <el-button
-              v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              @click="handleUpdate(scope.row)"
-            >办理</el-button>
-            <el-button
-              v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-              icon="el-icon-search"
-              type="primary"
-              size="mini"
-              @click="handleSign(scope.row)"
-            >详情</el-button>
-          </template>
-          <template v-else>
-            <el-button
-              v-if="scope.row.c_state == 2"
-              v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-              type="warning"
-              size="mini"
-              @click="handleOver(scope.row)"
-            >结束火化</el-button>
-            <el-button
-              v-if="scope.row.c_state == 1"
-              v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-              type="danger"
-              size="mini"
-              @click="handleFire(scope.row)"
-            >开始火化</el-button>
-            <template v-if="scope.row.c_state == 3">
-              <el-button
-                v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-                type="info"
-                size="mini"
-                @click="handleQu(scope.row)"
-              >取灰</el-button>
-              <el-button
-                v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-                type="primary"
-                size="mini"
-                @click="handleSave(scope.row)"
-              >寄存</el-button>
-            </template>
-            <el-button
-              v-if="scope.row.c_state == 4 || scope.row.c_state == 5"
-              v-permission="['POST /api/v1/cemetery_classify/g_edit']"
-              type="danger"
-              plain
-              size="mini"
-            >已完结</el-button>
-          </template> -->
         </template>
       </el-table-column>
     </el-table>
@@ -238,9 +185,8 @@
     </el-dialog>
 
     <el-dialog :close-on-click-modal="false" title="查看" :visible.sync="dialogFormVisibleInfo">
-      <!-- <h3 style="text-align: center;font-size:22px;font-weight: 100; margin: 0 0 15px 0">嘉鱼殡仪馆火化及申请书</h3> -->
-      <div class="bury_car">
-        <h1 class="bury_car_h1">逝者信息</h1>
+      <div class="temp-content">
+        <h1>逝者信息</h1>
         <el-row :gutter="20">
           <el-col :span="8">
             <div class="grid-content">
@@ -271,8 +217,8 @@
           </el-col>
         </el-row>
       </div>
-      <div v-if="server ? server.length > 0 : false" class="bury_car" style="border:1px solid #23C6C8;margin-top:10px;">
-        <h1 class="bury_car_h1" style="background:#23C6C8;color:#fff">所选服务</h1>
+      <div v-if="server ? server.length > 0 : false" class="temp-content temp-content-server">
+        <h1>所选服务</h1>
         <el-row :gutter="20">
           <div v-for="(item,index) in server" :key="index">
             <el-col :span="8">
@@ -294,16 +240,11 @@
         </el-row>
       </div>
       <div slot="footer" class="dialog-footer">
-        <!-- <span class="sign_">家属签字：<img v-if="record_sign" :src="record_sign" alt="" @click="dialogFormSign = true"> </span>
-        <el-button v-if="record_ifsign == 0" type="primary" @click="sign_open">签字</el-button> -->
-        <!-- <el-button v-if="record_ifsign == 0" type="primary" @click="SignSend">确定</el-button> -->
-        <!-- <el-button type="primary" @click="handlePrint">打印</el-button> -->
         <el-button @click="dialogFormVisibleInfo = false">取消</el-button>
       </div>
     </el-dialog>
     <!-- <el-dialog :close-on-click-modal="false" title="打印" :visible.sync="dialogFormVisibleFire"> -->
     <fire v-show="false" ref="fire_" />
-
     <el-dialog :close-on-click-modal="false" title="火化炉列表" :visible.sync="dialogFormVisibleper" append-to-body>
       <el-form
         ref="furnaces"
@@ -339,25 +280,19 @@ import {
   addfire,
   listfire,
   editfire,
-  signfire,
   statefire,
-  checkfire,
-  sendfire,
-  cremationserial,
   servicessign,
   createcarcommon
 } from '@/api/manage'
 import axios from 'axios'
 import Pagination from '@/components/Pagination'
 import service from '@/components/Service'
-// import { managerlist } from '@/api/vocational'
 import { listfurnace } from '@/api/setting'
 import fire from '@/components/Print/fire'
 import { vuexData } from '@/utils/mixin'
-import e560 from '@/components/E560'
 export default {
   name: 'VueGarden',
-  components: { Pagination, service, e560, fire },
+  components: { Pagination, service, fire },
   mixins: [vuexData],
   data() {
     return {
@@ -367,11 +302,8 @@ export default {
       setServer: [],
       getservice: [],
       activeName: 'info',
-      dialogFormVisibleGo: false,
       dialogFormVisibleInfo: false,
       dialogFormVisibleper: false,
-      // dialogFormVisibleFire: false,
-      dialogFormSign: false,
       listLoading: true,
       listQuery: {
         page: 1,
@@ -529,9 +461,6 @@ export default {
         }
         this.server = [].concat.apply([], server)
         this.dialogFormVisibleInfo = true
-        // this.signatureid = row.id
-        // this.record_sign = row.signature
-        // this.record_ifsign = row.ifsignature
       })
     },
     solo(arr) {
@@ -569,18 +498,7 @@ export default {
         server: null
       }
     },
-    createGoData() {
-      sendfire(this.send).then(res => {
-        if (res.code == 0) {
-          this.getList()
-          this.dialogFormVisibleGo = false
-          this.$message({
-            type: 'success',
-            message: '操作成功!'
-          })
-        }
-      })
-    },
+
     handleSi(v) {
       const data = {
         oid: v.oid,
@@ -629,6 +547,7 @@ export default {
         }
       })
     },
+
     handleQu(v) {
       this.$confirm('是否取灰?', '提示', {
         confirmButtonText: '取灰',
@@ -657,33 +576,7 @@ export default {
         })
       })
     },
-    // handleOver(row) {
-    //   this.$confirm('火化是否完成?', '提示', {
-    //     confirmButtonText: '完成',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   }).then(() => {
-    //     const data = {
-    //       id: row.id,
-    //       c_id: row.c_id,
-    //       state: row.c_state
-    //     }
-    //     statefire(data).then(res => {
-    //       if (res.code == 0) {
-    //         this.getList()
-    //         this.$message({
-    //           type: 'success',
-    //           message: '操作成功!'
-    //         })
-    //       }
-    //     })
-    //   }).catch(() => {
-    //     this.$message({
-    //       type: 'info',
-    //       message: '操作取消'
-    //     })
-    //   })
-    // },
+
     handleFire(row) {
       this.furnace.setServer = ''
       this.furnace.state = row.state
@@ -694,33 +587,6 @@ export default {
         this.getservice = res.data.data
         this.$forceUpdate()
       })
-      // this.$prompt('请输入火化牌号', '信息', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   inputPattern: /^[0-9]*$/,
-      //   inputErrorMessage: '请输入数字'
-      // }).then(({ value }) => {
-      //   const data = {
-      //     id: row.id,
-      //     c_id: row.c_id,
-      //     state: row.c_state,
-      //     number: value
-      //   }
-      //   statefire(data).then(res => {
-      //     if (res.code == 0) {
-      //       this.getList()
-      //       this.$message({
-      //         type: 'success',
-      //         message: '操作成功!'
-      //       })
-      //     }
-      //   })
-      // }).catch(() => {
-      //   this.$message({
-      //     type: 'info',
-      //     message: '操作取消'
-      //   })
-      // })
     },
     handleCreate() {
       this.resetForm()
@@ -757,27 +623,7 @@ export default {
         }
       })
     },
-    handleClick() {
 
-    },
-    SignSend() {
-      const data = { signature: this.record_sign, id: this.signatureid }
-      signfire(data).then(res => {
-        if (res.code == 0) {
-          this.$notify.success({
-            title: '成功',
-            message: '操作成功'
-          })
-          this.getList()
-          this.dialogFormVisibleInfo = false
-        } else {
-          this.$notify.error({
-            title: '失败',
-            message: res.msg
-          })
-        }
-      })
-    },
     handleUpdate(row) {
       this.dataForm = Object.assign({}, row)
       this.dataForm = {
@@ -834,34 +680,7 @@ export default {
         }
       })
     }
-    // handleDelete(row) {
-    //   delobituary(row)
-    //     .then(res => {
-    //       this.$confirm('您确认删除吗?', '提示', {
-    //         confirmButtonText: '确定',
-    //         cancelButtonText: '取消',
-    //         type: 'warning'
-    //       }).then(() => {
-    //         const index = this.list.indexOf(row)
-    //         this.list.splice(index, 1)
-    //         this.$message({
-    //           type: 'success',
-    //           message: '删除成功!'
-    //         })
-    //       }).catch(() => {
-    //         this.$message({
-    //           type: 'info',
-    //           message: '已取消删除'
-    //         })
-    //       })
-    //     })
-    //     .catch(res => {
-    //       this.$notify.error({
-    //         title: '失败',
-    //         message: res.msg
-    //       })
-    //     })
-    // }
+
   }
 }
 </script>

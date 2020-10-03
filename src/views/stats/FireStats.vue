@@ -24,6 +24,7 @@
         value-format="yyyy-MM-dd"
         placeholder="结束时间"
       />
+
       <el-button
         class="filter-item"
         type="primary"
@@ -44,35 +45,14 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="姓名" prop="realname" />
-      <el-table-column align="center" label="接运" prop="title" />
-      <el-table-column align="center" label="高档火灰炉" prop="title153">
-        <template slot-scope="scope">
-          {{ scope.row.price153 == 0 ? '' : scope.row.title153 }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="普通平板炉" prop="title152">
-        <template slot-scope="scope">
-          {{ scope.row.price152 == 0 ? '' : scope.row.title152 }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="洗澡更衣" prop="title143">
-        <template slot-scope="scope">
-          {{ scope.row.price143 == 0 ? '' : scope.row.title143 }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="化妆" prop="title142">
-        <template slot-scope="scope">
-          {{ scope.row.price142 == 0 ? '' : scope.row.title142 }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="特殊整理" prop="title131">
-        <template slot-scope="scope">
-          {{ scope.row.price131 == 0 ? '' : scope.row.title131 }}
-        </template>
-      </el-table-column>
+      <el-table-column align="center" label="火化编号" prop="serial" />
+      <el-table-column align="center" label="火化时间" prop="farewelltime" />
+      <el-table-column align="center" label="逝者姓名" prop="o_name" />
+      <el-table-column align="center" label="年龄" prop="o_age" />
+      <el-table-column align="center" label="性别" prop="o_sex" />
+      <el-table-column align="center" label="联系人" prop="o_linkman" />
+      <el-table-column align="center" label="联系电话" prop="o_linkphone" />
     </el-table>
-
     <pagination
       v-show="total>0"
       :total="total"
@@ -83,7 +63,7 @@
   </div>
 </template>
 <script>
-import { statisticsuid } from '@/api/stats'
+import { statisticsgather } from '@/api/stats'
 import Pagination from '@/components/Pagination'
 import { vuexData } from '@/utils/mixin'
 export default {
@@ -94,16 +74,16 @@ export default {
     return {
       list: null,
       total: 0,
+      village: '',
       listLoading: true,
       downloadLoading: false,
+      options: [],
       listQuery: {
         page: 1,
         limit: 20,
         startime: null,
         endtime: null,
-        servicestype: '',
         search_data: '',
-        title: '',
         sort: 'add_time',
         order: 'desc'
       }
@@ -116,9 +96,10 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      statisticsuid(this.listQuery)
+      statisticsgather(this.listQuery)
         .then(res => {
-          this.list = res.data
+          this.list = res.data.data
+          this.total = res.data.total || 0
           this.listLoading = false
         })
         .catch(() => {
@@ -131,39 +112,24 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
+
     handleDownload() {
       this.downloadLoading = true
-      statisticsuid(this.listQuery)
+      this.listQuery.limit = this.total
+      statisticsgather(this.listQuery)
         .then(res => {
-          this.export_list = res.data.map(v => {
-            if (parseInt(v.price131) == 0) {
-              v.title131 = ''
-            }
-            if (parseInt(v.price142) == 0) {
-              v.title142 = ''
-            }
-            if (parseInt(v.price143) == 0) {
-              v.title143 = ''
-            }
-            if (parseInt(v.price152) == 0) {
-              v.title152 = ''
-            }
-            if (parseInt(v.price153) == 0) {
-              v.title153 = ''
-            }
-            return v
-          })
-          import('@/vendor/Export2Excel').then(excel => {
-            const filterVal = ['realname', 'title', 'title153', 'title152', 'title143', 'title142', 'title141']
-            const tHeader = ['姓名', '接运', '高档火灰炉', '普通平板炉', '洗澡更衣', '化妆', '特殊整理']
-            const data = this.formatJson(filterVal, this.export_list)
-            excel.export_json_to_excel({
-              header: tHeader,
-              data,
-              filename: '车间绩效统计'
-            })
-            this.downloadLoading = false
-          })
+          this.export_list = res.data.data
+      import('@/vendor/Export2Excel').then(excel => {
+        const filterVal = ['serial', 'farewelltime', 'o_name', 'o_age', 'o_sex', 'o_card', 'o_linkman', 'o_linkphone']
+        const tHeader = ['火化编号', '火化时间', '逝者姓名', '年龄', '性别', '身份证', '联系人', '联系电话']
+        const data = this.formatJson(filterVal, this.export_list)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: '火化统计'
+        })
+        this.downloadLoading = false
+      })
         })
     },
     formatJson(filterVal, jsonData) {

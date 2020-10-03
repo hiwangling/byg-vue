@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-date-picker
-        v-model="listQuery.startime"
-        style="width:180px"
-        type="month"
-        value-format="yyyy-MM"
-        placeholder="选择月"
+      <el-input
+        v-model="listQuery.search_data"
+        clearable
+        class="filter-item"
+        style="width: 200px;"
+        placeholder="请输入关键字"
       />
       <el-button
         class="filter-item"
@@ -31,30 +31,25 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="上月库存" prop="repertory" />
-      <el-table-column align="center" label="本月进油" prop="enter" />
-      <el-table-column align="center" label="总油" prop="sumup" />
-      <el-table-column align="center" label="平板炉应用油" prop="puse" />
-      <el-table-column align="center" label="拣灰炉应用油" prop="juse" />
-      <el-table-column align="center" label="平板炉实际用油" prop="psuse" />
-      <el-table-column align="center" label="拣灰炉实际用油" prop="jsuse" />
-      <el-table-column align="center" label="节油" prop="economy" />
-      <el-table-column align="center" label="试炉用油" prop="syuse" />
-      <el-table-column align="center" label="本月存油" prop="deposit" />
-      <el-table-column align="center" label="制表人" prop="operator" />
-      <el-table-column align="center" label="制表时间" prop="operatortime" />
-      <el-table-column align="center" label="操作" class-name="small-padding fixed-width" width="220">
+      <el-table-column align="center" label="编号" prop="title" />
+      <el-table-column align="center" label="室" prop="room" />
+      <el-table-column align="center" label="柜" prop="chest" />
+      <el-table-column align="center" label="排" prop="ix" />
+      <el-table-column align="center" label="号" prop="iy" />
+      <el-table-column align="center" label="到期日期" prop="endday" />
+      <el-table-column align="center" label="描述" prop="vcdesc" />
+      <el-table-column align="center" label="状态" prop="usestate" width="100">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.usestate == 1 ? '' : 'danger'">{{ scope.row.usestate == 1 ? '空闲' : '使用中' }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" class-name="small-padding fixed-width" width="160">
         <template slot-scope="scope">
           <el-button
             type="primary"
             size="mini"
             @click="handleUpdate(scope.row)"
           >编辑</el-button>
-          <el-button
-            type="primary"
-            size="mini"
-            @click="handlePrint(scope.row)"
-          >打印</el-button>
           <el-button
             type="danger"
             size="mini"
@@ -81,49 +76,48 @@
         :model="dataForm"
         status-icon
         label-position="left"
-        label-width="120px"
+        label-width="100px"
       >
-        <el-form-item label="上月库存" prop="repertory">
-          <el-input v-model="dataForm.repertory" />
+        <el-form-item label="编号" prop="title">
+          <el-input v-model="dataForm.title" />
         </el-form-item>
-        <el-form-item label="本月进油" prop="enter">
-          <el-input v-model="dataForm.enter" />
+        <el-form-item label="室" prop="room">
+          <el-input v-model="dataForm.room" />
         </el-form-item>
-        <el-form-item label="总油" prop="sumup">
-          <el-input v-model="dataForm.sumup" />
+
+        <el-form-item label="柜" prop="chest">
+          <el-input v-model="dataForm.chest" />
         </el-form-item>
-        <el-form-item label="平板炉应用油" prop="puse">
-          <el-input v-model="dataForm.puse" />
+        <el-form-item label="排" prop="ix">
+          <el-input v-model="dataForm.ix" />
         </el-form-item>
-        <el-form-item label="拣灰炉应用油" prop="juse">
-          <el-input v-model="dataForm.juse" />
+        <el-form-item label="号" prop="iy">
+          <el-input v-model="dataForm.iy" />
         </el-form-item>
-        <el-form-item label="平板炉实际用油" prop="psuse">
-          <el-input v-model="dataForm.psuse" />
+        <el-form-item label="状态" prop="usestate">
+          <el-select
+            v-model="dataForm.usestate"
+            placeholder="选择单位"
+            clearable
+            class="filter-item"
+            style="width:185px"
+          >
+            <el-option label="空闲" :value="1" />
+            <el-option label="使用" :value="2" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="拣灰炉实际用油" prop="jsuse">
-          <el-input v-model="dataForm.jsuse" />
-        </el-form-item>
-        <el-form-item label="节油" prop="economy">
-          <el-input v-model="dataForm.economy" />
-        </el-form-item>
-        <el-form-item label="试炉用油" prop="syuse">
-          <el-input v-model="dataForm.syuse" />
-        </el-form-item>
-        <el-form-item label="本月存油" prop="deposit">
-          <el-input v-model="dataForm.deposit" />
-        </el-form-item>
-        <el-form-item label="制表人" prop="operator">
-          <el-input v-model="dataForm.operator" />
-        </el-form-item>
-        <el-form-item label="制表时间" prop="operatortime">
+        <el-form-item label="到期时间" prop="endday">
           <el-date-picker
-            v-model="dataForm.operatortime"
-            style="width:180px"
-            type="month"
-            value-format="yyyy-MM"
-            placeholder="选择月"
+            v-model="dataForm.endday"
+            style="width: 180px"
+            class="filter-item"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="到期时间"
           />
+        </el-form-item>
+        <el-form-item label="描述" prop="vcdesc">
+          <el-input v-model="dataForm.vcdesc" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -132,16 +126,14 @@
         <el-button v-else type="primary" @click="updateData">确定</el-button>
       </div>
     </el-dialog>
-    <oil v-show="false" ref="oil" />
   </div>
 </template>
 <script>
-import { oilstatlist, oilstatadd, oilstatedit, oilstatdel } from '@/api/merits'
+import { lockerlist, lockeradd, lockeredit, lockerdel } from '@/api/setting'
 import Pagination from '@/components/Pagination'
-import oil from '@/components/Print/oil'
 export default {
   name: 'VueGarden',
-  components: { Pagination, oil },
+  components: { Pagination },
   data() {
     return {
       list: null,
@@ -150,25 +142,23 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        startime: '',
-        endtime: '',
         search_data: '',
         sort: 'add_time',
         order: 'desc'
       },
+
       dataForm: {
-        repertory: '',
-        enter: '',
-        sumup: '',
-        puse: '',
-        juse: '',
-        psuse: '',
-        jsuse: '',
-        economy: '',
-        syuse: '',
-        deposit: '',
-        operator: '',
-        operatortime: null
+        id: '',
+        title: '',
+        room: '',
+        chest: '',
+        ix: '',
+        iy: '',
+        oid: '',
+        usestate: '',
+        endday: null,
+        vcdesc: ''
+
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -178,7 +168,7 @@ export default {
       },
       rules: {
         type_name: [
-          { required: true, message: '墓园名称不能为空', trigger: 'blur' }
+          { required: true, message: '名称不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -190,15 +180,15 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      oilstatlist(this.listQuery)
+      lockerlist(this.listQuery)
         .then(res => {
           this.list = res.data.data
           this.total = res.data.total || 0
-
           this.listLoading = false
         })
         .catch(() => {
           this.list = []
+          this.total = 0
           this.listLoading = false
         })
     },
@@ -208,18 +198,16 @@ export default {
     },
     resetForm() {
       this.dataForm = {
-        repertory: '',
-        enter: '',
-        sumup: '',
-        puse: '',
-        juse: '',
-        psuse: '',
-        jsuse: '',
-        economy: '',
-        syuse: '',
-        deposit: '',
-        operator: '',
-        operatortime: null
+        id: '',
+        title: '',
+        room: '',
+        chest: '',
+        ix: '',
+        iy: '',
+        oid: '',
+        usestate: 1,
+        endday: null,
+        vcdesc: ''
       }
     },
     handleCreate() {
@@ -233,7 +221,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          oilstatadd(this.dataForm)
+          lockeradd(this.dataForm)
             .then(res => {
               this.getList()
               this.dialogFormVisible = false
@@ -251,9 +239,6 @@ export default {
         }
       })
     },
-    handlePrint(row) {
-      this.$refs.oil.init(row)
-    },
     handleUpdate(row) {
       this.dataForm = Object.assign({}, row)
       this.dialogStatus = 'update'
@@ -265,7 +250,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          oilstatedit(this.dataForm)
+          lockeredit(this.dataForm)
             .then(() => {
               for (const v of this.list) {
                 if (v.id === this.dataForm.id) {
@@ -290,13 +275,13 @@ export default {
       })
     },
     handleDelete(row) {
-      oilstatdel(row)
-        .then(res => {
-          this.$confirm('您确认删除吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
+      this.$confirm('您确认删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        lockerdel(row)
+          .then(res => {
             const index = this.list.indexOf(row)
             this.list.splice(index, 1)
             this.$message({
@@ -309,7 +294,7 @@ export default {
               message: '已取消删除'
             })
           })
-        })
+      })
         .catch(res => {
           this.$notify.error({
             title: '失败',

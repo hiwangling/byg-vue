@@ -6,6 +6,7 @@
     :style="{
       'top':child.top + 'px',
       'left':child.left + 'px',
+      'width':child.width + 'px',
       'text-align':'left'
     }"
     @input="changeTxt"

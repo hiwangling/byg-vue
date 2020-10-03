@@ -26,15 +26,25 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="部门权限" prop="branch">
+      <el-table-column align="center" label="角色权限" prop="branch">
         <template slot-scope="scope">
           <el-tag type="primary" style="margin-right: 20px;"> {{ formatRole(scope.row) }} </el-tag>
         </template>
       </el-table-column>
-
+      <el-table-column align="center" label="所属部门" prop="deptid">
+        <template slot-scope="scope">
+          <el-tag type="primary" style="margin-right: 20px;"> {{ formatRoles(scope.row) }} </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button
+            v-permission="['get /api/v1/manager/del']"
+            type="danger"
+            size="mini"
+            @click="handleDelete(scope.row)"
+          >删除</el-button>
         </template>
       </el-table-column>
 
@@ -69,12 +79,22 @@
             <el-radio :label="0">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="部门权限" prop="branch">
+        <el-form-item label="角色权限" prop="branch">
           <el-select v-model="dataForm.branch" clearable placeholder="请选择">
             <el-option
               v-for="item in roleOptions"
               :key="item.id"
               :label="item.branch_name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属部门" prop="deptid">
+          <el-select v-model="dataForm.deptid" clearable placeholder="请选择">
+            <el-option
+              v-for="item in depts"
+              :key="item.id"
+              :label="item.vcname"
               :value="item.id"
             />
           </el-select>
@@ -90,8 +110,9 @@
   </div>
 </template>
 <script>
-import { listAdmin, createAdmin, updateAdmin } from '@/api/member'
-import { roleOptions } from '@/api/role'
+import { listAdmin, createAdmin, updateAdmin, deleteAdmin } from '@/api/member'
+import { roleOptions, deptlist } from '@/api/role'
+
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -111,6 +132,7 @@ export default {
       list: null,
       total: 0,
       roleOptions: null,
+      depts: null,
       listGrade: null,
       listLoading: true,
       listQuery: {
@@ -127,6 +149,7 @@ export default {
         realname: undefined,
         grade_name: undefined,
         branch: null,
+        deptid: '',
         mobile: undefined,
         sex: null,
         status: 1
@@ -151,6 +174,10 @@ export default {
       .then(res => {
         this.roleOptions = res.data
       })
+    deptlist()
+      .then(res => {
+        this.depts = res.data.data
+      })
   },
   methods: {
     formatRole(roleId) {
@@ -158,6 +185,16 @@ export default {
         for (let i = 0; i < this.roleOptions.length; i++) {
           if (roleId.branch === this.roleOptions[i].id) {
             return this.roleOptions[i].branch_name
+          }
+        }
+      }
+      return ''
+    },
+    formatRoles(roleId) {
+      if (this.depts) {
+        for (let i = 0; i < this.depts.length; i++) {
+          if (roleId.deptid === this.depts[i].id) {
+            return this.depts[i].vcname
           }
         }
       }
@@ -189,6 +226,7 @@ export default {
         realname: undefined,
         grade_name: undefined,
         branch: null,
+        deptid: '',
         mobile: undefined,
         sex: '男',
         status: 1
@@ -232,6 +270,34 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
+    },
+    handleDelete(row) {
+      this.$confirm('您确认删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAdmin(row)
+          .then(res => {
+            const index = this.list.indexOf(row)
+            this.list.splice(index, 1)
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+      })
+        .catch(res => {
+          this.$notify.error({
+            title: '失败',
+            message: res.msg
+          })
+        })
     },
     updateData() {
       this.$refs['dataForm'].validate(valid => {

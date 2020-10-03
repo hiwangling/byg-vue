@@ -302,20 +302,40 @@ aside {
   font-size: 14px;
 }
 
-.bury_car{
-  border: 1px solid #EEEEEE;
+.temp-content{
+border: 1px solid #EEEEEE;
 border-radius: 5px;
 }
-.bury_car_h1{
+.temp-title{
+  text-align: center;
+  font-size:22px;
+  font-weight: 800; 
+  margin: 0 0 15px 0
+}
+.temp-content h1{
   height: 40px;
   line-height: 40px;
   background: #F5F5F5;
   font-size: 16px;
- 
   margin: 0;
   padding-left: 10px;
 }
-
+.temp-content-cold{
+  border:1px solid #63afde;
+  margin-top:10px;
+}
+.temp-content-cold h1{
+  background:#63afde;
+  color:#fff
+}
+.temp-content-server{
+  border:1px solid rgb(35, 198, 200);
+  margin-top:10px;
+}
+.temp-content-server h1{
+  background: rgb(35, 198, 200);
+  color: rgb(255, 255, 255);
+}
 .grid-content{
   padding-left: 10px;
 }

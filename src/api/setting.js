@@ -345,3 +345,54 @@ export function deletefurnace(query) {
     params: query
   })
 }
+
+export function villagelist(data) {
+  return request({
+    url: '/village/list',
+    method: 'post',
+    data
+  })
+}
+
+export function villageadd(data) {
+  return request({
+    url: '/village/add',
+    method: 'post',
+    data
+  })
+}
+export function villagedel(query) {
+  return request({
+    url: '/village/del',
+    method: 'get',
+    params: query
+  })
+}
+export function lockerlist(data) {
+  return request({
+    url: '/locker/list',
+    method: 'post',
+    data
+  })
+}
+export function lockeradd(data) {
+  return request({
+    url: '/locker/add',
+    method: 'post',
+    data
+  })
+}
+export function lockeredit(data) {
+  return request({
+    url: '/locker/edit',
+    method: 'post',
+    data
+  })
+}
+export function lockerdel(query) {
+  return request({
+    url: '/locker/del',
+    method: 'get',
+    params: query
+  })
+}

@@ -1,7 +1,7 @@
 {
-  "name": "vue",
+  "name": "byg",
   "version": "1.0.0",
-  "description": "公墓管理系统",
+  "description": "殡仪馆管理系统",
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -41,7 +41,7 @@
     "driver.js": "0.9.5",
     "dropzone": "5.5.1",
     "echarts": "4.2.1",
-    "element-ui": "^2.11.1",
+    "element-ui": "^2.13.0",
     "file-saver": "2.0.1",
     "fuse.js": "3.4.4",
     "js-cookie": "2.2.0",
@@ -60,6 +60,7 @@
     "vue-splitpane": "1.0.4",
     "vuedraggable": "2.20.0",
     "vuex": "3.1.0",
+    "weapp.socket.io": "^2.0.1",
     "xlsx": "0.14.1"
   },
   "devDependencies": {

@@ -14,6 +14,12 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查找</el-button>
+      <el-button
+        class="filter-item"
+        type="primary"
+        icon="el-icon-edit"
+        @click="handleCreate"
+      >添加</el-button>
     </div>
 
     <!-- 查询结果 -->
@@ -25,23 +31,9 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="编号" prop="papers" width="60" />
-      <el-table-column align="center" label="逝者姓名" prop="name" />
-      <el-table-column align="center" label="身份证" prop="card" />
-      <el-table-column align="center" label="低保类型" prop="basic">
-        <template slot-scope="scope">
-          {{ scope.row.basic | basic_list }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="乡镇" prop="villages">
-        <template slot-scope="scope">
-          {{ scope.row.villages | villages_list }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="火化费" prop="oneprice" />
-      <el-table-column align="center" label="遗体消毒费" prop="twoprice" />
-      <el-table-column align="center" label="冰棺,车费" prop="threeprice" />
-      <el-table-column align="center" label="总价" prop="totalprice" />
+      <el-table-column align="center" label="部门名称" prop="vcname" />
+      <el-table-column align="center" label="部门描述" prop="vcdesc" />
+
       <el-table-column align="center" label="操作" class-name="small-padding fixed-width" width="160">
         <template slot-scope="scope">
           <el-button
@@ -77,48 +69,28 @@
         label-position="left"
         label-width="100px"
       >
-        <el-form-item label="证件编号" prop="papers">
-          <el-input v-model="dataForm.papers" />
+        <el-form-item label="部门名称" prop="vcname">
+          <el-input v-model="dataForm.vcname" />
         </el-form-item>
-        <el-form-item label="逝者姓名" prop="name">
-          <el-input v-model="dataForm.name" />
+        <el-form-item label="部门描述" prop="vcdesc">
+          <el-input v-model="dataForm.vcdesc" />
         </el-form-item>
-        <el-form-item label="火化费" prop="oneprice">
-          <el-input v-model="dataForm.oneprice" />
-        </el-form-item>
-        <el-form-item label="遗体消毒费" prop="twoprice">
-          <el-input v-model="dataForm.twoprice" />
-        </el-form-item>
-        <el-form-item label="冰棺,车费" prop="threeprice">
-          <el-input v-model="dataForm.threeprice" />
-        </el-form-item>
-        <el-form-item label="总价" prop="totalprice">
-          <el-input v-model="dataForm.totalprice" />
-        </el-form-item>
-        <el-form-item label="乡镇" prop="villages">
-          <el-select v-model="dataForm.villages" placeholder="乡镇" clearable class="filter-item" style="width:185px">
-            <el-option v-for="(item,value,index) in villages" :key="index" :label="item" :value="value + 1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="dataForm.remark" type="textarea" :rows="2" />
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="updateData">确定</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">确定</el-button>
+        <el-button v-else type="primary" @click="updateData">确定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-import { financeDerateList, financeDerateEdit, financeDerateDel } from '@/api/manage'
+import { deptlist, deptadd, deptedit, deptdel } from '@/api/role'
 import Pagination from '@/components/Pagination'
-import { vuexData } from '@/utils/mixin'
 export default {
   name: 'VueGarden',
   components: { Pagination },
-  mixins: [vuexData],
   data() {
     return {
       list: null,
@@ -131,17 +103,12 @@ export default {
         sort: 'add_time',
         order: 'desc'
       },
+
       dataForm: {
-        name: '',
-        papers: '',
-        oneprice: '',
-        twoprice: '',
-        threeprice: '',
-        totalprice: '',
-        operator: '',
-        villages: '',
-        remark: '',
-        id: ''
+        vcdesc: '',
+        id: '',
+        vcname: '',
+        status: 1
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -151,7 +118,7 @@ export default {
       },
       rules: {
         type_name: [
-          { required: true, message: '墓园名称不能为空', trigger: 'blur' }
+          { required: true, message: '名称不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -163,7 +130,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      financeDerateList(this.listQuery)
+      deptlist(this.listQuery)
         .then(res => {
           this.list = res.data.data
           this.total = res.data.total || 0
@@ -179,6 +146,43 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
+    resetForm() {
+      this.dataForm = {
+        vcdesc: '',
+        id: '',
+        vcname: '',
+        status: 1
+      }
+    },
+    handleCreate() {
+      this.resetForm()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    createData() {
+      this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          deptadd(this.dataForm)
+            .then(res => {
+              this.getList()
+              this.dialogFormVisible = false
+              this.$notify.success({
+                title: '成功',
+                message: '添加成功'
+              })
+            })
+            .catch(res => {
+              this.$notify.error({
+                title: '失败',
+                message: res.msg
+              })
+            })
+        }
+      })
+    },
     handleUpdate(row) {
       this.dataForm = Object.assign({}, row)
       this.dialogStatus = 'update'
@@ -188,10 +192,9 @@ export default {
       })
     },
     updateData() {
-      this.dataForm.operator = this.info.realname
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          financeDerateEdit(this.dataForm)
+          deptedit(this.dataForm)
             .then(() => {
               for (const v of this.list) {
                 if (v.id === this.dataForm.id) {
@@ -216,13 +219,13 @@ export default {
       })
     },
     handleDelete(row) {
-      financeDerateDel(row)
-        .then(res => {
-          this.$confirm('您确认删除吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
+      this.$confirm('您确认删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deptdel(row)
+          .then(res => {
             const index = this.list.indexOf(row)
             this.list.splice(index, 1)
             this.$message({
@@ -235,7 +238,7 @@ export default {
               message: '已取消删除'
             })
           })
-        })
+      })
         .catch(res => {
           this.$notify.error({
             title: '失败',

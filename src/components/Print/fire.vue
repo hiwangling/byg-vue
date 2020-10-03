@@ -1,7 +1,7 @@
 <template>
   <div>
     <div ref="print">
-      <h3 style="text-align:center;display:inline-block;height:20px;font-weight: 800;width:100%;margin-top:20px;">2019年火化登记表</h3>
+      <h3 style="text-align:center;display:inline-block;height:20px;font-weight: 800;width:100%;margin-top:20px;">2020年火化登记表</h3>
       <div style="text-align:right;padding-right:50px">编号: {{ list.serial }}</div>
       <table class="tb" border="0" cellspacing="0" cellpadding="0" style="border:0">
         <tr>
@@ -73,7 +73,7 @@
           <td style="border: none;" />
           <td style="border: none;" />
           <td style="border: none;">{{ currentdate }}</td>
-          </td></tr>
+        </tr>
       </table>
     </div>
   </div>

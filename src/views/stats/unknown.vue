@@ -53,12 +53,11 @@
           <el-button
             type="primary"
             size="mini"
-            @click="InfoSend(scope.row)"
+            @click="handleInfo(scope.row)"
           >详情</el-button>
         </template>
       </el-table-column>
     </el-table>
-
     <pagination
       v-show="total>0"
       :total="total"
@@ -66,16 +65,16 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-    <info ref="info" />
+    <ServerInfo ref="info" />
   </div>
 </template>
 <script>
 import { statsunknown } from '@/api/stats'
-import info from '@/components/Info'
+import ServerInfo from '@/components/ServerInfo'
 import Pagination from '@/components/Pagination'
 export default {
   name: 'VueGarden',
-  components: { Pagination, info },
+  components: { Pagination, ServerInfo },
   data() {
     return {
       list: null,
@@ -115,7 +114,7 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    InfoSend(v) {
+    handleInfo(v) {
       this.$refs.info.handleInfo(v)
     }
 

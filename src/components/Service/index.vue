@@ -25,9 +25,19 @@
                   @blur="confirmEdit(row)"
                   @focus="confirmFocus(row)"
                 />
-                <el-input-number v-model="row.number" :min="1" :max="10" label="" size="mini" @change="handleChange(row)" />
-                <el-button v-if="row.performance == 1" size="mini" type="info" plain @click="info(row)">请选择</el-button>
+                <el-input-number v-model="row.number" :min="1" :max="1000" label="" size="mini" @change="handleChange(row)" />
+                <el-button v-if="row.info" size="mini" type="info" plain @click="info(row)">详情</el-button>
               </template>
+            </template>
+          </el-table-column>
+          <el-table-column prop="task" align="center" label="备注" width="150">
+            <template slot-scope="{row}">
+              <el-input
+                v-model="row.task"
+                class="edit-input"
+                size="mini"
+                style="width:80px"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -59,14 +69,14 @@
         <el-table-column prop="totalprice" />
       </el-table>
     </el-tabs>
-    <el-dialog :close-on-click-modal="false" title="人员列表" :visible.sync="dialogFormVisible" append-to-body>
+    <el-dialog :close-on-click-modal="false" title="已选套餐" :visible.sync="dialogFormVisible" append-to-body>
       <el-checkbox-group v-model="setServer">
         <el-checkbox
           v-for="(value, item) in getservice"
           :key="item"
-          :label="value.id"
+          :label="value.sid"
           style="width:150px"
-        >{{ value.realname }}({{ value.branch_name }})</el-checkbox>
+        >{{ value.title }}({{ value.price }})</el-checkbox>
       </el-checkbox-group>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -77,7 +87,7 @@
 </template>
 <script>
 import {
-  managerlist
+  getserver
 } from '@/api/vocational'
 export default {
   data() {
@@ -145,14 +155,14 @@ export default {
       this.index = tab.index
     },
     init() {
-      var temp = []
       var tab = []
       if (this.list != null) {
         this.activeName = this.list[0].title ? this.list[0].title : ''
-        temp = this.list.map(v => {
+        this.list.map(v => {
           v.services.map(k => {
             this.$set(k, 'number', 1)
             this.$set(k, 'inlet', null)
+            this.$set(k, 'remark', '')
             this.$set(k, 'totalprice', k.price)
           })
           if (v.key == 6) {
@@ -185,8 +195,9 @@ export default {
                   t.number = n.number
                   t.inlet = n.inlet
                   t.state = n.state
+                  t.remark = n.remark
                   t.totalprice = n.totalprice
-                  t.perforname = n.perforname
+                  t.combo = n.combo
                 }
               }
             })
@@ -206,19 +217,18 @@ export default {
     info(v) {
       this.dialogFormVisible = true
       var setService = []
-      managerlist().then(res => {
+      const data = { id: v.id }
+      getserver(data).then(res => {
         this.getservice = res.data
         if (this.clear == 0) {
           res.data.forEach(v => {
-            setService.push(v.id)
+            setService.push(v.sid)
           })
         } else {
-          setService = v.perforname ? v.perforname : []
+          setService = v.combo ? v.combo : []
         }
         this.row = v
-
         this.setServer = setService
-
         this.$forceUpdate()
       })
     },
@@ -229,15 +239,6 @@ export default {
     editService(v) {
       this.getList()
       this.service = v
-
-      // console.log(val)
-      // var editRow = []
-      // this.service.forEach((v, k) => {
-      //   editRow.push(v.services)
-      // })
-      // this.editRow = [].concat.apply([], editRow)
-      // this.sell = this.editRow
-      // console.log(this.sell)
     },
     confirmEdit(row) {
       this.changeSell()
@@ -264,18 +265,17 @@ export default {
       this.$emit('service_data', data)
     },
     changeprice(v) {
-      // let sum_price = 0
-      // this.getservice.forEach(v => {
-      //   this.setServer.forEach(k => {
-      //     if (v.sid == k) {
-      //       sum_price = sum_price + parseInt(v.price)
-      //     }
-      //   })
-      // })
-      // // console.log(this.setServer)
-      // this.price = sum_price
-      // this.row.price = this.price
-      this.row.perforname = this.setServer
+      let sum_price = 0
+      this.getservice.forEach(v => {
+        this.setServer.forEach(k => {
+          if (v.sid == k) {
+            sum_price = sum_price + parseInt(v.price)
+          }
+        })
+      })
+      this.price = sum_price
+      this.row.price = this.price
+      this.row.combo = this.setServer
     },
     // 获取已选服务
     handleSelectionChange(val) {
@@ -288,13 +288,6 @@ export default {
       // SellArray = SellArray.filter(item => item != undefined)
       this.sell = SellArray
     }
-    // SendData() {
-    //   const data = {
-    //     services_totalprice: this.sum_price,
-    //     service: this.sell
-    //   }
-    //   this.$emit('service_data', data)
-    // }
   }
 }
 </script>

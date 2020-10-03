@@ -87,6 +87,13 @@ export function infoobituary(query) {
     params: query
   })
 }
+export function cabinetinfo(query) {
+  return request({
+    url: '/cabinet/info',
+    method: 'get',
+    params: query
+  })
+}
 export function editobituary(data) {
   return request({
     url: '/obituary/edit',
@@ -374,3 +381,90 @@ export function servicessign(data) {
     data
   })
 }
+export function business(query) {
+  return request({
+    url: '/mourn/business',
+    method: 'get',
+    params: query
+  })
+}
+export function canteenpay(data) {
+  return request({
+    url: '/canteen/pay',
+    method: 'post',
+    data
+  })
+}
+
+// 悼念阁
+export function cabinetList(data) {
+  return request({
+    url: '/cabinet/list',
+    method: 'post',
+    data
+  })
+}
+export function cabinetadd(data) {
+  return request({
+    url: '/cabinet/add',
+    method: 'post',
+    data
+  })
+}
+export function cabinetedit(data) {
+  return request({
+    url: '/cabinet/edit',
+    method: 'post',
+    data
+  })
+}
+export function cabinetdel(query) {
+  return request({
+    url: '/cabinet/del',
+    method: 'get',
+    params: query
+  })
+}
+export function checkdel(query) {
+  return request({
+    url: '/check/del',
+    method: 'get',
+    params: query
+  })
+}
+export function financeBrtinfo(query) {
+  return request({
+    url: '/financeBrt/info',
+    method: 'get',
+    params: query
+  })
+}
+export function financeBrtlist(data) {
+  return request({
+    url: '/financeBrt/list',
+    method: 'post',
+    data
+  })
+}
+export function financeBrtadd(data) {
+  return request({
+    url: '/financeBrt/add',
+    method: 'post',
+    data
+  })
+}
+export function postPay(data) {
+  return request({
+    url: '/finance/postPay',
+    method: 'post',
+    data
+  })
+}
+export function smzfprint(query) {
+  return request({
+    url: '/finance/smzfprint',
+    method: 'get',
+    params: query
+  })
+}
+

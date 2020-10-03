@@ -1,7 +1,7 @@
 <template>
   <div>
     <div ref="print" style="padding:20px">
-      <h3 class="print_title">嘉鱼县殡葬管理所殡仪服务申请单</h3>
+      <h3 class="print_title">嘉鱼县殡葬管理所殡仪服务结算单</h3>
       <div class="prinr_foot">
         {{ currentdate }}
       </div>
@@ -10,7 +10,7 @@
           <td>逝者姓名</td>
           <td style="width:100px">{{ list.name }}</td>
           <td style="width:50px">性别</td>
-          <td>{{ list.sex }}</td>
+          <td style="width:50px">{{ list.sex }}</td>
           <td>年龄</td>
           <td>{{ list.age }}</td>
           <td>死亡原因</td>
@@ -27,12 +27,12 @@
           <td>{{ list.linkman }}</td>
           <td>性别</td>
           <td>{{ list.linksex }}</td>
-          <td>年龄</td>
+          <td>联系电话</td>
           <td>{{ list.linkphone }}</td>
           <td>与逝者关系</td>
           <td>{{ list.relation }}</td>
         </tr>
-        <tr v-if="send">
+        <!-- <tr v-if="send">
           <th colspan="8">接 运 服 务</th>
         </tr>
         <tr v-for="(val,item,index) in send" :key="index">
@@ -42,8 +42,8 @@
           <td colspan="2">{{ val.create_time }}</td>
           <td>接运价格</td>
           <td>{{ val.totalprice }}</td>
-        </tr>
-        <tr v-if="mourn">
+        </tr> -->
+        <!-- <tr v-if="mourn">
           <th colspan="8">灵 堂 服 务</th>
         </tr>
         <tr v-if="mourn">
@@ -53,7 +53,7 @@
           <td colspan="2">{{ mourn.create_time }}</td>
           <td>结束时间</td>
           <td colspan="2">{{ mourn.endtime }}</td>
-        </tr>
+        </tr> -->
         <tr>
           <th colspan="8">已 选 服 务 项 目</th>
         </tr>
@@ -64,11 +64,22 @@
           <td colspan="2">合计</td>
         </tr>
         <tr v-for="(val,item,index) in server" :key="index" class="servers">
-
           <td colspan="2">{{ val.title }} </td>
           <td colspan="2">{{ val.number }}</td>
           <td colspan="2">{{ val.price }}</td>
           <td colspan="2">{{ val.totalprice }}</td>
+        </tr>
+        <tr v-if="mourn != null">
+          <td colspan="2">悼念厅</td>
+          <td colspan="2">1</td>
+          <td colspan="2">{{ mourn.price }}</td>
+          <td colspan="2">{{ mourn.totalprice }}</td>
+        </tr>
+        <tr v-if="cold != null">
+          <td colspan="2">冷柜</td>
+          <td colspan="2">1</td>
+          <td colspan="2">{{ cold.price }}</td>
+          <td colspan="2">{{ cold.totalprice }}</td>
         </tr>
         <tr>
           <td colspan="2">总计</td>
@@ -96,6 +107,7 @@ export default {
       },
       server: null,
       mourn: null,
+      cold: null,
       send: null,
       currentdate: '',
       totalprice: ''
@@ -108,9 +120,17 @@ export default {
     print() {
       this.$print(this.$refs.print)
     },
+    solo(arr) {
+      var editRow = []
+      arr.forEach((v, k) => {
+        editRow.push(v.services)
+      })
+      return [].concat.apply([], editRow)
+    },
     init(v) {
-      this.server = v.voca
+      this.server = this.solo(v.voca)
       this.list = v.list
+      this.cold = v.cold
       this.mourn = v.mourn
       this.totalprice = v.totalprice
       this.send = v.carsend

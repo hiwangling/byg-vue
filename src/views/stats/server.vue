@@ -19,16 +19,16 @@
         v-model="listQuery.startime"
         style="width: 200px"
         class="filter-item"
-        type="date"
-        value-format="yyyy-MM-dd"
+        type="datetime"
+        value-format="yyyy-MM-dd HH:mm:ss"
         placeholder="开始时间"
       />
       <el-date-picker
         v-model="listQuery.endtime"
         style="width: 200px"
         class="filter-item"
-        type="date"
-        value-format="yyyy-MM-dd"
+        type="datetime"
+        value-format="yyyy-MM-dd HH:mm:ss"
         placeholder="结束时间"
       />
       <el-select
@@ -69,7 +69,11 @@
       <el-table-column align="center" label="服务单价" prop="price" />
       <el-table-column align="center" label="服务数量" prop="count_id" />
       <el-table-column align="center" label="服务总价" prop="sum_price" />
-
+      <el-table-column align="center" label="操作" class-name="small-padding" width="180">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" icon="el-icon-search" @click="handleInfo(scope.row)">详情</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination
@@ -79,10 +83,31 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
+    <el-dialog :close-on-click-modal="false" title="服务明细" :visible.sync="dialogFormserver">
+      <el-table
+        v-loading="listLoadingserver"
+        :data="server"
+        element-loading-text="正在查询中。。。"
+        border
+        fit
+        highlight-current-row
+      >
+        <el-table-column align="center" label="服务名称" prop="title" />
+        <el-table-column align="center" label="服务单价" prop="price" />
+        <el-table-column align="center" label="服务数量" prop="count_id" />
+        <el-table-column align="center" label="服务总价" prop="sum_price" />
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button :loading="downloadLoadings" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownloads">
+          导出
+        </el-button>
+        <el-button @click="dialogFormserver = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { statservices } from '@/api/stats'
+import { statservices, statsservicesInfo } from '@/api/stats'
 import Pagination from '@/components/Pagination'
 import { vuexData } from '@/utils/mixin'
 export default {
@@ -92,9 +117,16 @@ export default {
   data() {
     return {
       list: null,
+      server: null,
+
       total: 0,
+      export_lists: null,
+      export_list: null,
       listLoading: true,
+      downloadLoadings: false,
+      dialogFormserver: false,
       downloadLoading: false,
+      listLoadingserver: false,
       listQuery: {
         page: 1,
         limit: 20,
@@ -130,13 +162,59 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
+    handleInfo(row) {
+      const data = {
+        title: row.title,
+        startime: this.listQuery.startime,
+        endtime: this.listQuery.endtime
+      }
+      this.listLoadingserver = true
+      statsservicesInfo(data).then(res => {
+        this.server = res.data
+        this.dialogFormserver = true
+        this.listLoadingserver = false
+      })
+    },
+    changeSell(sell) {
+      let sum_price = 0
+      let sum_number = 0
+      if (sell) {
+        sell.forEach((v, k) => {
+          sum_price = sum_price + parseInt(v.sum_price)
+          sum_number = sum_number + parseInt(v.count_id)
+        })
+      }
+      this.server.push(
+        {
+          title: '总计',
+          count_id: sum_number,
+          sum_price: sum_price,
+          s_type: ''
+        }
+      )
+    },
+
+    handleDownloads() {
+      this.changeSell(this.server)
+      this.export_lists = this.server
+      import('@/vendor/Export2Excel').then(excel => {
+        const filterVal = ['title', 'count_id', 'sum_price', 's_type']
+        const tHeader = ['服务名称', '数量', '总价', '服务类型']
+        const data = this.formatJson(filterVal, this.export_lists)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: '服务详情单'
+        })
+      })
+    },
     handleDownload() {
       this.downloadLoading = true
       statservices(this.listQuery)
         .then(res => {
           this.export_list = res.data
       import('@/vendor/Export2Excel').then(excel => {
-        const filterVal = ['title', 'number', 'totalprice', 's_type']
+        const filterVal = ['title', 'count_id', 'sum_price', 's_type']
         const tHeader = ['服务名称', '数量', '总价', '服务类型']
         const data = this.formatJson(filterVal, this.export_list)
         excel.export_json_to_excel({

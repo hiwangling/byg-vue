@@ -50,6 +50,13 @@ export function statservices(data) {
     data
   })
 }
+export function statsservicesInfo(data) {
+  return request({
+    url: '/statistics/servicesInfo',
+    method: 'post',
+    data
+  })
+}
 export function statsupplies(data) {
   return request({
     url: '/statistics/supplies',
@@ -123,4 +130,69 @@ export function statisticsuid(data) {
     data
   })
 }
+export function statisticspuid(data) {
+  return request({
+    url: '/statistics/puid',
+    method: 'post',
+    data
+  })
+}
 
+export function obituarycount(query) {
+  return request({
+    url: '/obituary/count',
+    method: 'get',
+    params: query
+  })
+}
+
+export function printorderlist(query) {
+  return request({
+    url: '/obituary/printorderlist',
+    method: 'get',
+    params: query
+  })
+}
+export function printRenew(query) {
+  return request({
+    url: '/check/printRenew',
+    method: 'get',
+    params: query
+  })
+}
+export function printCheck(query) {
+  return request({
+    url: '/check/printCheck',
+    method: 'get',
+    params: query
+  })
+}
+
+export function printList(query) {
+  return request({
+    url: '/cabinet/printList',
+    method: 'get',
+    params: query
+  })
+}
+export function financeList(data) {
+  return request({
+    url: '/statistics/financeList',
+    method: 'post',
+    data
+  })
+}
+export function mournarrange(query) {
+  return request({
+    url: '/obituary_record/hall_list',
+    method: 'get',
+    params: query
+  })
+}
+export function cold_list(query) {
+  return request({
+    url: '/obituary_record/cold_list',
+    method: 'get',
+    params: query
+  })
+}

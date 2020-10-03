@@ -14,9 +14,19 @@ const memberRouter = {
       name: 'VueGroup',
       component: () => import('@/views/member/group'),
       meta: {
-        title: '部门管理',
+        title: '角色管理',
         noCache: true,
         perms: ['post /api/v1/branch/list']
+      }
+    },
+    {
+      path: '/dept',
+      name: 'Vuedept',
+      component: () => import('@/views/member/dept'),
+      meta: {
+        title: '部门管理',
+        noCache: true,
+        perms: ['post /api/v1/dept/list']
       }
     },
     {
@@ -26,7 +36,17 @@ const memberRouter = {
       meta: {
         title: '员工管理',
         noCache: true,
-        perms: ['get /api/v1/manager/list']
+        perms: ['get /api/v1/manager/list', 'get /api/v1/manager/del']
+      }
+    },
+    {
+      path: '/prems',
+      name: 'Vueprems',
+      component: () => import('@/views/member/prems'),
+      meta: {
+        title: '权限管理',
+        noCache: true,
+        perms: ['post /api/v1/prems/list']
       }
     },
     {

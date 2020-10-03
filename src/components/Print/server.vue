@@ -4,7 +4,10 @@
       <h3 class="print_title">嘉鱼殡葬管理所专用收据</h3>
       <div class="prinr_foot">
         <span style="font-size:14px">逝者姓名: {{ name }}</span>
-        <span style="font-size:14px">{{ currentdate }}</span>
+        <div>
+          <span style="font-size:14px">编号: {{ serial }}</span>
+        </div>
+
       </div>
       <table id="hall_print" class="table_print">
         <tr>
@@ -29,15 +32,15 @@
           <td>{{ val.totalprice }}</td>
         </tr>
         <tr v-if="mourn != null">
-          <td>{{ mourn.title }}</td>
-          <td>灵堂服务</td>
+          <td>悼念厅</td>
+          <td>延伸服务</td>
           <td>1</td>
           <td>{{ mourn.price }}</td>
           <td>{{ mourn.totalprice }}</td>
         </tr>
         <tr v-if="cold != null">
-          <td>{{ cold.title }}</td>
-          <td>冷柜服务</td>
+          <td>冷柜</td>
+          <td>延伸服务</td>
           <td>1</td>
           <td>{{ cold.price }}</td>
           <td>{{ cold.totalprice }}</td>
@@ -51,7 +54,7 @@
       </table>
       <div class="prinr_foot">
         <span>经办人:{{ operator }}</span>
-        <!-- <span>业务电话: 0715-6357916</span> -->
+        <span style="font-size:14px">{{ currentdate }}</span>
       </div>
     </div>
   </div>
@@ -72,6 +75,7 @@ export default {
       name: '',
       mourn: null,
       cold: null,
+      serial: '',
       currentdate: '',
       operator: '',
       totalprice: ''
@@ -97,11 +101,11 @@ export default {
       return [].concat.apply([], editRow)
     },
     getlist(v) {
-      console.log(v)
-      this.list = v.voca
+      this.list = this.solo(v.voca)
       this.name = v.name
       this.operator = v.operator
       this.mourn = v.mourn
+      this.serial = v.serial
       this.cold = v.cold
       this.totalprice = v.totalprice
       this.send = v.send

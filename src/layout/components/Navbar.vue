@@ -17,12 +17,8 @@
         </el-tooltip>
 
       </template> -->
-      <span
-        style="position: relative;
-    top: -15px;
-    font-size:20px;
-    color:#666"
-      >{{ this.info.realname }}</span>
+
+      <el-tag class="cname">{{ this.info.realname }}</el-tag>
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
@@ -81,6 +77,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.cname{
+  position: relative;
+    top: -15px;
+    font-size:18px;
+
+}
 .navbar {
   height: 50px;
   overflow: hidden;

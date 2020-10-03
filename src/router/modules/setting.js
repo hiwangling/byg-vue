@@ -14,7 +14,7 @@ const settingRouter = {
       name: 'Vuemourn',
       component: () => import('@/views/setting/mourn'),
       meta: {
-        title: '悼念厅管理',
+        title: '悼念厅配置',
         noCache: true,
         perms: ['post /api/v1/mourn/list']
       }
@@ -24,71 +24,51 @@ const settingRouter = {
       name: 'Vuefurnace',
       component: () => import('@/views/setting/furnace'),
       meta: {
-        title: '火化炉管理',
+        title: '火化炉配置',
         noCache: true,
         perms: ['post /api/v1/furnace/list']
       }
     },
     {
       path: '/cold',
-      name: 'Vuecold',
+      name: 'Vuecolds',
       component: () => import('@/views/setting/cold'),
       meta: {
-        title: '冷柜管理',
+        title: '冷柜配置',
         noCache: true,
         perms: ['post /api/v1/cold/list']
       }
     },
-    // {
-    //   path: '/car',
-    //   name: 'Vuecar',
-    //   component: () => import('@/views/setting/car'),
-    //   meta: {
-    //     title: '车辆管理',
-    //     noCache: true,
-    //     perms: ['POST /api/v1/manager/list', 'POST /api/v1/manager/add', 'POST /api/v1/manager/edit']
-    //   }
-    // },
+    {
+      path: '/car',
+      name: 'Vuecar',
+      component: () => import('@/views/setting/car'),
+      meta: {
+        title: '车辆配置',
+        noCache: true,
+        perms: ['POST /api/v1/manager/list', 'POST /api/v1/manager/add', 'POST /api/v1/manager/edit']
+      }
+    },
     {
       path: '/services',
       name: 'Vueservices',
       component: () => import('@/views/setting/services'),
       meta: {
-        title: '服务管理',
+        title: '服务配置',
         noCache: true,
         perms: ['post /api/v1/services/list']
       }
     },
-    // {
-    //   path: '/combo',
-    //   name: 'Vuecombo',
-    //   component: () => import('@/views/setting/combo'),
-    //   meta: {
-    //     title: '套餐管理',
-    //     noCache: true,
-    //     perms: ['POST /api/v1/manager/list', 'POST /api/v1/manager/add', 'POST /api/v1/manager/edit']
-    //   }
-    // },
-    // {
-    //   path: '/supplies',
-    //   name: 'Vuesupplies',
-    //   component: () => import('@/views/setting/supplies'),
-    //   meta: {
-    //     title: '丧葬用品',
-    //     noCache: true,
-    //     perms: ['POST /api/v1/manager/list', 'POST /api/v1/manager/add', 'POST /api/v1/manager/edit']
-    //   }
-    // },
-    // {
-    //   path: '/wreath',
-    //   name: 'Vuewreath',
-    //   component: () => import('@/views/setting/wreath'),
-    //   meta: {
-    //     title: '花圈挽联',
-    //     noCache: true,
-    //     perms: ['POST /api/v1/manager/list', 'POST /api/v1/manager/add', 'POST /api/v1/manager/edit']
-    //   }
-    // },
+    {
+      path: '/combo',
+      name: 'Vuecombo',
+      component: () => import('@/views/setting/combo'),
+      meta: {
+        title: '套餐配置',
+        noCache: true,
+        perms: ['POST /api/v1/manager/list', 'POST /api/v1/manager/add', 'POST /api/v1/manager/edit']
+      }
+    },
     {
       path: '/config',
       name: 'Vueconfig',

@@ -10,7 +10,7 @@
 
     <!-- 查询结果 -->
     <el-table v-loading="listLoading" :data="list" element-loading-text="正在查询中。。。" border fit highlight-current-row>
-      <el-table-column align="center" label="部门名称" prop="branch_name" />
+      <el-table-column align="center" label="角色名称" prop="branch_name" />
       <el-table-column align="center" label="操作" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -31,7 +31,7 @@
     <!-- 添加或修改对话框 -->
     <el-dialog :close-on-click-modal="false" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="部门名称" prop="branch_name">
+        <el-form-item label="角色名称" prop="branch_name">
           <el-input v-model="dataForm.branch_name" />
         </el-form-item>
         <!--         <el-form-item label="说明" prop="desc">
@@ -177,6 +177,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
@@ -205,21 +206,26 @@ export default {
       })
     },
     handleDelete(row) {
-      deleteRole(row)
-        .then(res => {
-          this.$notify.success({
-            title: '成功',
-            message: '删除管理员成功'
+      this.$confirm('您确认删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const data = { id: row.id }
+        deleteRole(data)
+          .then(res => {
+            this.getList()
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
           })
-          const index = this.list.indexOf(row)
-          this.list.splice(index, 1)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
         })
-        .catch(res => {
-          this.$notify.error({
-            title: '失败',
-            message: res.data.errmsg
-          })
-        })
+      })
     },
     handlePermission(row) {
       this.permissionDialogFormVisible = true
